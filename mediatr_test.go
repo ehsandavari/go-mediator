@@ -1,8 +1,8 @@
 package mediator
 
 import (
-	"context"
 	"fmt"
+	"github.com/ehsandavari/go-context-plus"
 	"github.com/goccy/go-reflect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -79,7 +79,7 @@ func (t *mediatorTests) Test_RegisterRequestHandler_Should_Register_All_Handlers
 
 func (t *mediatorTests) Test_Send_Should_Throw_Error_If_No_Handler_Registered() {
 	defer cleanup()
-	_, err := Send[*RequestTest, *ResponseTest](context.Background(), &RequestTest{Data: "test"})
+	_, err := Send[*RequestTest, *ResponseTest](contextplus.Background(), &RequestTest{Data: "test"})
 	assert.Containsf(t, err.Error(), ErrorRequestHandlerNotFound.String(), "expected error containing %q, got %s", ErrorRequestHandlerNotFound.String(), err)
 }
 
@@ -90,7 +90,7 @@ func (t *mediatorTests) Test_Send_Should_Return_Error_If_Handler_Returns_Error()
 	if errRegister != nil {
 		t.Error(errRegister)
 	}
-	_, err := Send[*RequestTest2, *ResponseTest2](context.Background(), &RequestTest2{Data: "test"})
+	_, err := Send[*RequestTest2, *ResponseTest2](contextplus.Background(), &RequestTest2{Data: "test"})
 	assert.NotNil(t, err)
 }
 
@@ -102,7 +102,7 @@ func (t *mediatorTests) Test_Send_Should_Dispatch_Request_To_Handler_And_Get_Res
 		t.Error(errRegister)
 	}
 
-	response, err := Send[*RequestTest, *ResponseTest](context.Background(), &RequestTest{Data: "test"})
+	response, err := Send[*RequestTest, *ResponseTest](contextplus.Background(), &RequestTest{Data: "test"})
 	assert.Nil(t, err)
 	assert.IsType(t, &ResponseTest{}, response)
 	assert.Equal(t, "test", response.Data)
@@ -123,7 +123,7 @@ func (t *mediatorTests) Test_Send_Should_Dispatch_Request_To_Handler_And_Get_Res
 		t.Error(errRegister)
 	}
 
-	response, err := Send[*RequestTest, *ResponseTest](context.Background(), &RequestTest{Data: "test"})
+	response, err := Send[*RequestTest, *ResponseTest](contextplus.Background(), &RequestTest{Data: "test"})
 	assert.Nil(t, err)
 	assert.IsType(t, &ResponseTest{}, response)
 	assert.Equal(t, "test", response.Data)
@@ -155,7 +155,7 @@ func (t *mediatorTests) Test_RegisterNotificationHandlers_Should_Register_Multip
 // notifications could have zero or more handlers
 func (t *mediatorTests) Test_Publish_Should_Pass_If_No_Handler_Registered() {
 	defer cleanup()
-	err := Publish[*NotificationTest](context.Background(), &NotificationTest{})
+	err := Publish[*NotificationTest](contextplus.Background(), &NotificationTest{})
 	assert.Nil(t, err)
 }
 
@@ -166,7 +166,7 @@ func (t *mediatorTests) Test_Publish_Should_Return_Error_If_Handler_Returns_Erro
 	handler3 := &NotificationTestHandler3{}
 	RegisterNotificationHandlers[*NotificationTest](handler1, handler2, handler3)
 
-	err := Publish[*NotificationTest](context.Background(), &NotificationTest{})
+	err := Publish[*NotificationTest](contextplus.Background(), &NotificationTest{})
 	assert.NotNil(t, err)
 }
 
@@ -177,7 +177,7 @@ func (t *mediatorTests) Test_Publish_Should_Dispatch_Notification_To_All_Handler
 	RegisterNotificationHandlers[*NotificationTest](handler1, handler2)
 
 	notification := &NotificationTest{}
-	err := Publish[*NotificationTest](context.Background(), notification)
+	err := Publish[*NotificationTest](contextplus.Background(), notification)
 	assert.Nil(t, err)
 	assert.True(t, notification.Processed)
 }
@@ -244,7 +244,7 @@ type ResponseTest struct {
 type RequestTestHandler struct {
 }
 
-func (c *RequestTestHandler) Handle(ctx context.Context, request *RequestTest) (*ResponseTest, IError) {
+func (c *RequestTestHandler) Handle(ctx contextplus.Context, request *RequestTest) (*ResponseTest, IError) {
 	fmt.Println("RequestTestHandler.Handled")
 	testData = append(testData, "RequestTestHandler")
 
@@ -263,7 +263,7 @@ type ResponseTest2 struct {
 type RequestTestHandler2 struct {
 }
 
-func (c *RequestTestHandler2) Handle(ctx context.Context, request *RequestTest2) (*ResponseTest2, IError) {
+func (c *RequestTestHandler2) Handle(ctx contextplus.Context, request *RequestTest2) (*ResponseTest2, IError) {
 	fmt.Println("RequestTestHandler2.Handled")
 	testData = append(testData, "RequestTestHandler2")
 
@@ -274,7 +274,7 @@ func (c *RequestTestHandler2) Handle(ctx context.Context, request *RequestTest2)
 type RequestTestHandler3 struct {
 }
 
-func (c *RequestTestHandler3) Handle(ctx context.Context, request *RequestTest2) (*ResponseTest2, IError) {
+func (c *RequestTestHandler3) Handle(ctx contextplus.Context, request *RequestTest2) (*ResponseTest2, IError) {
 	return nil, ErrorRequestHandlerAlreadyExists
 }
 
@@ -287,7 +287,7 @@ type NotificationTest struct {
 type NotificationTestHandler struct {
 }
 
-func (c *NotificationTestHandler) Handle(ctx context.Context, notification *NotificationTest) IError {
+func (c *NotificationTestHandler) Handle(ctx contextplus.Context, notification *NotificationTest) IError {
 	notification.Processed = true
 	fmt.Println("NotificationTestHandler.Handled")
 	testData = append(testData, "NotificationTestHandler")
@@ -304,7 +304,7 @@ type NotificationTest2 struct {
 type NotificationTestHandler2 struct {
 }
 
-func (c *NotificationTestHandler2) Handle(ctx context.Context, notification *NotificationTest2) IError {
+func (c *NotificationTestHandler2) Handle(ctx contextplus.Context, notification *NotificationTest2) IError {
 	notification.Processed = true
 	fmt.Println("NotificationTestHandler2.Handled")
 	testData = append(testData, "NotificationTestHandler2")
@@ -317,7 +317,7 @@ func (c *NotificationTestHandler2) Handle(ctx context.Context, notification *Not
 type NotificationTestHandler3 struct {
 }
 
-func (c *NotificationTestHandler3) Handle(ctx context.Context, notification *NotificationTest) IError {
+func (c *NotificationTestHandler3) Handle(ctx contextplus.Context, notification *NotificationTest) IError {
 	return ErrorRequestHandlerAlreadyExists
 }
 
@@ -325,7 +325,7 @@ func (c *NotificationTestHandler3) Handle(ctx context.Context, notification *Not
 type NotificationTestHandler4 struct {
 }
 
-func (c *NotificationTestHandler4) Handle(ctx context.Context, notification *NotificationTest) IError {
+func (c *NotificationTestHandler4) Handle(ctx contextplus.Context, notification *NotificationTest) IError {
 	notification.Processed = true
 	fmt.Println("NotificationTestHandler4.Handled")
 	testData = append(testData, "NotificationTestHandler4")
@@ -337,7 +337,7 @@ func (c *NotificationTestHandler4) Handle(ctx context.Context, notification *Not
 type PipelineBehaviourTest struct {
 }
 
-func (c *PipelineBehaviourTest) Handle(ctx context.Context, request any, next requestHandlerFunc) (any, IError) {
+func (c *PipelineBehaviourTest) Handle(ctx contextplus.Context, request any, next requestHandlerFunc) (any, IError) {
 	fmt.Println("PipelineBehaviourTest.Handled")
 	testData = append(testData, "PipelineBehaviourTest")
 
@@ -353,7 +353,7 @@ func (c *PipelineBehaviourTest) Handle(ctx context.Context, request any, next re
 type PipelineBehaviourTest2 struct {
 }
 
-func (c *PipelineBehaviourTest2) Handle(ctx context.Context, request any, next requestHandlerFunc) (any, IError) {
+func (c *PipelineBehaviourTest2) Handle(ctx contextplus.Context, request any, next requestHandlerFunc) (any, IError) {
 	fmt.Println("PipelineBehaviourTest2.Handled")
 	testData = append(testData, "PipelineBehaviourTest2")
 

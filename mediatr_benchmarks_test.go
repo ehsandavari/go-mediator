@@ -1,7 +1,7 @@
 package mediator
 
 import (
-	"context"
+	"github.com/ehsandavari/go-context-plus"
 	"github.com/goccy/go-reflect"
 	"testing"
 )
@@ -17,7 +17,7 @@ func Benchmark_Send(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	ctx := context.Background()
+	ctx := contextplus.Background()
 	for i := 0; i < b.N; i++ {
 		_, err := Send[*RequestTest, *ResponseTest](ctx, &RequestTest{Data: "test"})
 		if err != nil {
@@ -37,7 +37,7 @@ func Benchmark_Publish(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		err := Publish[*NotificationTest](context.Background(), &NotificationTest{Data: "test"})
+		err := Publish[*NotificationTest](contextplus.Background(), &NotificationTest{Data: "test"})
 		if err != nil {
 			b.Error(err)
 		}

@@ -1,8 +1,8 @@
 package mediator
 
 import (
-	"context"
 	"github.com/ahmetb/go-linq/v3"
+	"github.com/ehsandavari/go-context-plus"
 	"github.com/goccy/go-reflect"
 )
 
@@ -11,15 +11,15 @@ type requestHandlerFunc func() (any, IError)
 
 // iPipelineBehavior is a Pipeline behavior for wrapping the inner handler.
 type iPipelineBehavior interface {
-	Handle(ctx context.Context, request any, next requestHandlerFunc) (any, IError)
+	Handle(ctx contextplus.Context, request any, next requestHandlerFunc) (any, IError)
 }
 
 type iRequestHandler[TRequest any, TResponse any] interface {
-	Handle(ctx context.Context, request TRequest) (TResponse, IError)
+	Handle(ctx contextplus.Context, request TRequest) (TResponse, IError)
 }
 
 type iNotificationHandler[TNotification any] interface {
-	Handle(ctx context.Context, notification TNotification) IError
+	Handle(ctx contextplus.Context, notification TNotification) IError
 }
 
 var requestHandlersRegistrations = map[reflect.Type]any{}
@@ -87,7 +87,7 @@ func ClearNotificationRegistrations() {
 }
 
 // Send the request to its corresponding request handler.
-func Send[TRequest any, TResponse any](ctx context.Context, request TRequest) (TResponse, IError) {
+func Send[TRequest any, TResponse any](ctx contextplus.Context, request TRequest) (TResponse, IError) {
 	requestType := reflect.TypeOf(request)
 	var response TResponse
 	handler, ok := requestHandlersRegistrations[requestType]
@@ -139,7 +139,7 @@ func Send[TRequest any, TResponse any](ctx context.Context, request TRequest) (T
 }
 
 // Publish the notification event to its corresponding notification handler.
-func Publish[TNotification any](ctx context.Context, notification TNotification) IError {
+func Publish[TNotification any](ctx contextplus.Context, notification TNotification) IError {
 	eventType := reflect.TypeOf(notification)
 
 	handlers, ok := notificationHandlersRegistrations[eventType]
