@@ -51,7 +51,7 @@ type mediatorTests struct {
 
 func (t *mediatorTests) Test_Send_Should_Dispatch_Request_To_Factory() {
 	defer cleanup()
-	var factory1 TRequestHandlerFactory[*RequestTest, *ResponseTest] = func() RequestHandler[*RequestTest, *ResponseTest] {
+	var factory1 TRequestHandlerFactory[*RequestTest, *ResponseTest] = func() iRequestHandler[*RequestTest, *ResponseTest] {
 		return &RequestTestHandler{}
 	}
 	errRegister := RegisterRequestHandlerFactory(factory1)
@@ -89,10 +89,10 @@ func (t *mediatorTests) Test_RegisterRequestHandlerFactory_Should_Return_Error_I
 
 func (t *mediatorTests) Test_RegisterRequestHandlerFactory_Should_Register_All_Handlers_For_Different_Requests() {
 	defer cleanup()
-	var factory1 TRequestHandlerFactory[*RequestTest, *ResponseTest] = func() RequestHandler[*RequestTest, *ResponseTest] {
+	var factory1 TRequestHandlerFactory[*RequestTest, *ResponseTest] = func() iRequestHandler[*RequestTest, *ResponseTest] {
 		return &RequestTestHandler{}
 	}
-	var factory2 TRequestHandlerFactory[*RequestTest2, *ResponseTest2] = func() RequestHandler[*RequestTest2, *ResponseTest2] {
+	var factory2 TRequestHandlerFactory[*RequestTest2, *ResponseTest2] = func() iRequestHandler[*RequestTest2, *ResponseTest2] {
 		return &RequestTestHandler2{}
 	}
 
@@ -240,24 +240,20 @@ func (t *mediatorTests) Test_Publish_Should_Return_Error_If_Handler_Returns_Erro
 
 func (t *mediatorTests) Test_Publish_Should_Dispatch_Notification_To_All_Handlers_Factories_Without_Any_Response_And_Error() {
 	defer cleanup()
-	var factory1 NotificationHandlerFactory[*NotificationTest] = func() NotificationHandler[*NotificationTest] {
+	var factory1 TNotificationHandlerFactory[*NotificationTest] = func() iNotificationHandler[*NotificationTest] {
 		return &NotificationTestHandler{}
 	}
-	var factory2 NotificationHandlerFactory[*NotificationTest] = func() NotificationHandler[*NotificationTest] {
+	var factory2 TNotificationHandlerFactory[*NotificationTest] = func() iNotificationHandler[*NotificationTest] {
 		return &NotificationTestHandler4{}
 	}
 
-	errRegister := RegisterNotificationHandlersFactories(factory1, factory2)
-	if errRegister != nil {
-		t.Error(errRegister)
-	}
+	RegisterNotificationHandlersFactories(factory1, factory2)
 
 	notification := &NotificationTest{}
-	err := Publish[*NotificationTest](context.Background(), notification)
+	err := Publish[*NotificationTest](contextplus.Background(), notification)
 	assert.Nil(t, err)
 	assert.True(t, notification.Processed)
 }
-
 
 func (t *mediatorTests) Test_Publish_Should_Dispatch_Notification_To_All_Handlers_Without_Any_Response_And_Error() {
 	defer cleanup()
