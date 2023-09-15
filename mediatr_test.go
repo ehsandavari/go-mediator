@@ -68,8 +68,6 @@ func (t *mediatorTests) Test_Send_Should_Dispatch_Request_To_Factory() {
 func (t *mediatorTests) Test_RegisterRequestHandlerFactory_Should_Return_Error_If_Handler_Already_Registered_For_Request() {
 	defer cleanup()
 
-	expectedErr := fmt.Sprintf("registered handler already exists in the registry for message %s", "*mediatr.RequestTest")
-
 	var factory1 TRequestHandlerFactory[*RequestTest, *ResponseTest] = func() iRequestHandler[*RequestTest, *ResponseTest] {
 		return &RequestTestHandler{}
 	}
@@ -81,7 +79,7 @@ func (t *mediatorTests) Test_RegisterRequestHandlerFactory_Should_Return_Error_I
 	err2 := RegisterRequestHandlerFactory(factory2)
 
 	assert.Nil(t, err1)
-	assert.Containsf(t, err2.Error(), expectedErr, "expected error containing %q, got %s", expectedErr, err2)
+	assert.Containsf(t, err2.Error(), ErrorRequestHandlerAlreadyExists.String(), "expected error containing %q, got %s", ErrorRequestHandlerAlreadyExists.String(), err2)
 
 	count := len(requestHandlersRegistrations)
 	assert.Equal(t, 1, count)
