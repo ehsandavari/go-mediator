@@ -3,7 +3,7 @@
   <div align="center">
     <a href="https://github.com/ehsandavari/go-mediator/actions/workflows/ci.yml"><img alt="build-status" src="https://github.com/ehsandavari/go-mediator/actions/workflows/ci.yml/badge.svg?branch=main&style=flat-square"/></a>
     <a href="https://goreportcard.com/report/github.com/ehsandavari/go-mediator" ><img alt="go report" src="https://goreportcard.com/badge/github.com/ehsandavari/go-mediator"/></a>
-    <a><img alt="license" src="https://img.shields.io/badge/go%20version-%3E=1.18-61CFDD.svg?style=flat-square"/></a>
+    <a><img alt="license" src="https://img.shields.io/badge/go%20version-%3E=1.21-61CFDD.svg?style=flat-square"/></a>
     <a href="https://github.com/ehsandavari/go-mediator/blob/main/LICENCE"><img alt="build-status" src="https://img.shields.io/github/license/ehsandavari/go-mediator?color=%234275f5&style=flat-square"/></a>
     <a href="https://coveralls.io/github/ehsandavari/go-mediator?branch=main"><img alt="Coverage Status" src="https://img.shields.io/coveralls/github/ehsandavari/go-mediator?color=%23f542cb&style=flat-square"/></a>
     <a href="https://pkg.go.dev/github.com/ehsandavari/go-mediator"><img alt="build-status" src="https://pkg.go.dev/badge/github.com/ehsandavari/go-mediator"/></a>
